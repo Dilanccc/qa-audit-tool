@@ -36,7 +36,7 @@ CFG["Safety"]=["Sharp tool log","Metal detector calibration record","2 Hourly 9 
 CFG["Mold"]=["Form 25","Humidity check report","Moisture level check by Aqua boy","Fabric in process mold check report"];
 CFG["Management"]=["KPI monitoring mechanism","Problem solving for deviation"];
 CFG["QM"]=["Pre-final report available","Final report available","Measurement report available"];
-var STAGES=["Dashboard","LAB","RM","Cutting","Bonding","Production","IE","Machine","Safety","Mold","Management","Quality"];
+var STAGES=["Dashboard","LAB","RM","Cutting","Bonding/Heat Seal","Production","IE","Machine Maintenance","Safety","Mold","Management","QM"];
 var cur="Dashboard";var st={};var ph={};
 var audits=[];try{audits=JSON.parse(localStorage.getItem("qa_audits")||"[]")}catch(e){audits=[]}
 function save(){localStorage.setItem("qa_audits",JSON.stringify(audits))}
