@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QA Audit Tool - RM to FG | MAS</title>
+<style>
+*{box-sizing:border-box;font-family:Arial,sans-serif}body{margin:0;background:#f1f5f9;color:#111}
+header{background:#0f172a;color:#fff;padding:14px 16px;position:sticky;top:0;z-index:10}
+header h1{margin:0;font-size:19px}header p{margin:4px 0 0;font-size:12px;opacity:.8}
+nav{display:flex;gap:8px;padding:10px;background:#fff;overflow:auto;position:sticky;top:58px;z-index:9;border-bottom:1px solid #ddd}
+nav button{white-space:nowrap;border:1px solid #cbd5e1;background:#fff;padding:8px 12px;border-radius:20px;cursor:pointer;font-weight:700}
+nav button.active{background:#0f172a;color:#fff}
+.wrap{max-width:900px;margin:auto;padding:14px}
+.card{background:#fff;border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.kpi{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
+.kpi div{background:#fff;border-radius:12px;padding:12px;text-align:center}
+.kpi b{font-size:22px;display:block}.green{color:#16a34a}.red{color:#dc2626}.orange{color:#ea580c}
+label{font-size:12px;font-weight:700;display:block;margin-top:10px}input,select,textarea{width:100%;padding:10px;margin-top:4px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{background:#0f172a;color:#fff;border:0;padding:12px;border-radius:10px;width:100%;font-weight:800;cursor:pointer;margin-top:12px}
+.btn2{background:#16a34a;color:#fff;border:0;padding:8px 12px;border-radius:8px;cursor:pointer}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:8px;border-bottom:1px solid #eee;text-align:left}
+.badge{padding:3px 8px;border-radius:20px;font-size:11px;font-weight:800}.pass{background:#dcfce7;color:#166534}.fail{background:#fee2e2;color:#991b1b}
+.defect{display:flex;gap:6px;margin-top:8px}.defect input{flex:1}.small{font-size:12px;color:#64748b}
+@media(max-width:600px){.kpi{grid-template-columns:1fr 1fr}.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><h1>✅ QA AUDIT TOOL - RM to FG</h1><p>MAS Only • QMS Audit • QA Team View • DHU / FTR / AQL 2.5</p></header>
+<nav id="nav">
+<button class="active" onclick="show('dash',this)">📊 Dashboard</button>
+<button onclick="show('rm',this)">🧵 RM - Fabric</button>
+<button onclick="show('cut',this)">✂️ Cutting</button>
+<button onclick="show('inline',this)">⏱️ Hourly Inline</button>
+<button onclick="show('end',this)">🏁 Endline</button>
+<button onclick="show('fin',this)">👔 Finishing</button>
+<button onclick="show('final',this)">📦 Final AQL</button>
+<button onclick="show('list',this)">📋 All Audits</button>
+</nav>
+<div class="wrap">
+
+<!-- DASHBOARD -->
+<div id="dash" class="page">
+<div class="kpi">
+<div><span>Today Audits</span><b id="kTotal">0</b></div>
+<div><span>Pass</span><b class="green" id="kPass">0</b></div>
+<div><span>Fail</span><b class="red" id="kFail">0</b></div>
+<div><span>DHU %</span><b class="orange" id="kDhu">0%</b></div>
+</div>
+<div class="card"><h3>RM to FG - Stage Summary</h3><div id="stageBox"></div></div>
+<div class="card"><h3>Management Daily Summary - Auto</h3><p class="small">Endline DHU, Finishing DHU, Finishing Repairs %, Pre-Final / Final FTR %, Defect Rate</p>
+<div id="mgmtBox"></div>
+<button class="btn" onclick="window.print()">🖨️ Print / PDF Daily Report</button></div>
+<div class="card"><h3>Top Defects Today</h3><div id="topDefects">No data yet - Do first audit</div></div>
+</div>
+
+<!-- FORM TEMPLATE - JS will clone -->
+<div id="rm" class="page" style="display:none"><div class="card"><h2>🧵 RM Audit - Fabric Inspection</h2>
+<label>Date</label><input type="date" id="rm-date">
+<div class="row"><div><label>Supplier / Mill</label><input id="rm-sup" placeholder="Ex: Teejay"></div><div><label>Fabric / Style</label><input id="rm-style" placeholder="Ex: 4521 - Single Jersey"></div></div>
+<div class="row"><div><label>Roll No</label><input id="rm-roll" placeholder="Roll 12"></div><div><label>Roll Hardness (Y016A)</label><input type="number" id="rm-hard" placeholder="35-60 is good"></div></div>
+<div class="row"><div><label>Checked Meters</label><input type="number" id="rm-checked" value="100"></div><div><label>Total Defect Points (4-Point)</label><input type="number" id="rm-def" value="0"></div></div>
+<label>GSM</label><input id="rm-gsm" placeholder="Ex: 180">
+<label>Shrinkage %</label><input id="rm-shrink" placeholder="Ex: -3%">
+<label>Shade Result</label><select id="rm-shade"><option>OK - Shade Segregated</option><option>Shade Variation - Hold</option></select>
+<label>Remarks / Photo Note</label><textarea id="rm-rem" placeholder="Any stain, hole, GSM fail..."></textarea>
+<button class="btn" onclick="saveAudit('RM - Fabric')">✅ Save RM Audit</button></div></div>
+
+<div id="cut" class="page" style="display:none"><div class="card"><h2>✂️ Cutting Audit</h2>
+<label>Date</label><input type="date" id="cut-date">
+<div class="row"><div><label>Style / PO</label><input id="cut-style"></div><div><label>Marker No</label><input id="cut-marker"></div></div>
+<div class="row"><div><label>Checked Panels</label><input type="number" id="cut-checked" value="20"></div><div><label>Defective Panels</label><input type="number" id="cut-def" value="0"></div></div>
+<label>Spreading Check</label><select id="cut-spread"><option>PASS - Tension OK, No Wrinkle</option><option>FAIL - Tight Spreading</option><option>FAIL - Misaligned Ply</option></select>
+<label>Cut Panel Measurement</label><select id="cut-meas"><option>PASS - Within Tolerance</option><option>FAIL - Out of Tolerance</option></select>
+<button class="btn" onclick="saveAudit('Cutting')">✅ Save Cutting Audit</button></div></div>
+
+<div id="inline" class="page" style="display:none"><div class="card"><h2>⏱️ Hourly Inline Audit - AQL 2.5</h2>
+<label>Date / Hour</label><div class="row"><input type="date" id="in-date"><select id="in-hour"><option>08:00</option><option>09:00</option><option>10:00</option><option>11:00</option><option>13:00</option><option>14:00</option><option>15:00</option><option>16:00</option><option>17:00</option></select></div>
+<div class="row"><div><label>Line No</label><input id="in-line" placeholder="Line 3"></div><div><label>Style</label><input id="in-style"></div></div>
+<div class="row"><div><label>Checked Qty</label><input type="number" id="in-checked" value="20"></div><div><label>Defective Qty</label><input type="number" id="in-def" value="0"></div></div>
+<label>Defect Name</label><select id="in-defname"><option>Broken Stitch</option><option>Skip Stitch</option><option>Open Seam</option><option>Puckering</option><option>Uneven Stitch</option><option>Oil Stain / Dirty</option><option>Wrong Measurement</option><option>Hole</option><option>Other</option></select>
+<label>Operation</label><input id="in-op" placeholder="Ex: Side Seam, Collar Attach">
+<button class="btn" onclick="saveAudit('Hourly Inline')">✅ Save Inline Audit</button>
+<p class="small">Rule: If Defective > 1 in 20 pcs = FAIL for that hour. Need re-check.</p></div></div>
+
+<div id="end" class="page" style="display:none"><div class="card"><h2>🏁 Endline Audit - 100% Check</h2>
+<label>Date</label><input type="date" id="en-date">
+<div class="row"><div><label>Line</label><input id="en-line"></div><div><label>Style / PO</label><input id="en-style"></div></div>
+<div class="row"><div><label>Checked Qty</label><input type="number" id="en-checked" value="100"></div><div><label>Defects Found</label><input type="number" id="en-def" value="0"></div></div>
+<label>Top Defect</label><select id="en-defname"><option>Broken Stitch</option><option>Skip Stitch</option><option>Dirty Spot</option><option>Measurement Out</option><option>Puckering</option><option>Label Wrong</option></select>
+<button class="btn" onclick="saveAudit('Endline')">✅ Save Endline Audit</button></div></div>
+
+<div id="fin" class="page" style="display:none"><div class="card"><h2>👔 Finishing & Packing Audit</h2>
+<label>Date</label><input type="date" id="fin-date">
+<div class="row"><div><label>Style</label><input id="fin-style"></div><div><label>Checked Qty</label><input type="number" id="fin-checked" value="50"></div></div>
+<div class="row"><div><label>Defects</label><input type="number" id="fin-def" value="0"></div><div><label>Needle Detector Check</label><select id="fin-needle"><option>PASS - 9 Point Calibration OK</option><option>FAIL - Detector Fail</option></select></div></div>
+<label>Shade / Pressing</label><select id="fin-shade"><option>PASS</option><option>FAIL - Shade / Pressing Mark</option></select>
+<button class="btn" onclick="saveAudit('Finishing')">✅ Save Finishing Audit</button></div></div>
+
+<div id="final" class="page" style="display:none"><div class="card"><h2>📦 Final AQL Audit - AQL 2.5</h2>
+<label>Date</label><input type="date" id="fi-date">
+<div class="row"><div><label>Buyer / PO</label><input id="fi-po"></div><div><label>Lot Qty</label><input type="number" id="fi-lot" value="2000"></div></div>
+<div class="row"><div><label>Sample Qty (AQL Table)</label><input type="number" id="fi-checked" value="125"></div><div><label>Critical</label><input type="number" id="fi-crit" value="0"></div></div>
+<div class="row"><div><label>Major Defects</label><input type="number" id="fi-major" value="0"></div><div><label>Minor Defects</label><input type="number" id="fi-minor" value="0"></div></div>
+<p class="small">AQL 2.5 - For 125 pcs: Accept = 5 Major, Reject = 6 Major. Critical = 0 Accept.</p>
+<button class="btn" onclick="saveAudit('Final AQL')">✅ Save Final AQL Audit</button></div></div>
+
+<div id="list" class="page" style="display:none"><div class="card"><h2>📋 All Audits - QA Team View</h2>
+<select id="filter" onchange="render()"><option value="">All Stages</option><option>RM - Fabric</option><option>Cutting</option><option>Hourly Inline</option><option>Endline</option><option>Finishing</option><option>Final AQL</option></select>
+<div style="overflow:auto"><table><thead><tr><th>Date</th><th>Stage</th><th>Style/Line</th><th>Checked</th><th>Defects</th><th>DHU%</th><th>Result</th></tr></thead><tbody id="tbody"></tbody></table></div>
+<button class="btn" onclick="clearAll()">🗑️ Clear All Data (Test Only)</button></div></div>
+
+</div>
+<script>
+let audits=JSON.parse(localStorage.getItem('qa_audits')||'[]');
+function show(id,btn){document.querySelectorAll('.page').forEach(p=>p.style.display='none');document.getElementById(id).style.display='block';document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');if(id=='dash'||id=='list')render();}
+function getVal(id){return document.getElementById(id)?.value||''}
+function saveAudit(stage){
+let checked=0,def=0,extra='';
+if(stage=='RM - Fabric'){checked=+getVal('rm-checked');def=+getVal('rm-def');extra=getVal('rm-style')+' | Roll '+getVal('rm-roll')+' | Hardness '+getVal('rm-hard');}
+if(stage=='Cutting'){checked=+getVal('cut-checked');def=+getVal('cut-def');extra=getVal('cut-style');}
+if(stage=='Hourly Inline'){checked=+getVal('in-checked');def=+getVal('in-def');extra='Line '+getVal('in-line')+' | '+getVal('in-style')+' | '+getVal('in-defname');}
+if(stage=='Endline'){checked=+getVal('en-checked');def=+getVal('en-def');extra='Line '+getVal('en-line')+' | '+getVal('en-style')+' | '+getVal('en-defname');}
+if(stage=='Finishing'){checked=+getVal('fin-checked');def=+getVal('fin-def');extra=getVal('fin-style');}
+if(stage=='Final AQL'){checked=+getVal('fi-checked');def=(+getVal('fi-major'))+(+getVal('fi-crit'));extra=getVal('fi-po')+' | Major '+getVal('fi-major')+' Minor '+getVal('fi-minor');}
+let dhu=checked?((def/checked)*100).toFixed(1):0;
+let result='PASS';
+if(stage=='Hourly Inline' && def>1) result='FAIL';
+if(stage=='Final AQL' && def>=6) result='FAIL';
+if(stage!='Hourly Inline' && stage!='Final AQL' && parseFloat(dhu)>5) result='FAIL';
+if(stage=='Final AQL' && +getVal('fi-crit')>0) result='FAIL - CRITICAL';
+audits.unshift({date:new Date().toLocaleDateString(),stage,extra,checked,def,dhu,result});
+localStorage.setItem('qa_audits',JSON.stringify(audits));
+alert('✅ Saved! '+stage+' - '+result+' | DHU '+dhu+'%');
+render();show('dash',document.querySelector('nav button'));
+}
+function render(){
+let f=document.getElementById('filter')?.value||'';
+let list=f?audits.filter(a=>a.stage==f):audits;
+let pass=list.filter(a=>a.result.includes('PASS')).length;
+let totalDef=list.reduce((s,a)=>s+a.def,0);let totalChk=list.reduce((s,a)=>s+a.checked,0);
+document.getElementById('kTotal').innerText=list.length;
+document.getElementById('kPass').innerText=pass;
+document.getElementById('kFail').innerText=list.length-pass;
+document.getElementById('kDhu').innerText=totalChk?((totalDef/totalChk)*100).toFixed(1)+'%':'0%';
+let stages=['RM - Fabric','Cutting','Hourly Inline','Endline','Finishing','Final AQL'];
+document.getElementById('stageBox').innerHTML=stages.map(s=>{let l=audits.filter(a=>a.stage==s);let p=l.filter(a=>a.result.includes('PASS')).length;return `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee"><b>${s}</b><span>${l.length} Audits | ${p} Pass | ${l.length-p} Fail</span></div>`}).join('');
+document.getElementById('mgmtBox').innerHTML=`<p>Endline DHU: <b>${calcDhu('Endline')}%</b> | Finishing DHU: <b>${calcDhu('Finishing')}%</b> | Final FTR: <b>${calcFTR()}%</b> | Total Defect Rate: <b>${totalChk?((totalDef/totalChk)*100).toFixed(1):0}%</b></p>`;
+document.getElementById('tbody').innerHTML=list.map(a=>`<tr><td>${a.date}</td><td>${a.stage}</td><td>${a.extra}</td><td>${a.checked}</td><td>${a.def}</td><td>${a.dhu}%</td><td><span class="badge ${a.result.includes('PASS')?'pass':'fail'}">${a.result}</span></td></tr>`).join('')||'<tr><td colspan=7>No audits yet</td></tr>';
+}
+function calcDhu(s){let l=audits.filter(a=>a.stage==s);let c=l.reduce((x,a)=>x+a.checked,0);let d=l.reduce((x,a)=>x+a.def,0);return c?((d/c)*100).toFixed(1):0}
+function calcFTR(){let l=audits.filter(a=>a.stage=='Final AQL');if(!l.length)return 0;let p=l.filter(a=>a.result.includes('PASS')).length;return ((p/l.length)*100).toFixed(0)}
+function clearAll(){if(confirm('Clear all?')){audits=[];localStorage.removeItem('qa_audits');render();}}
+render();
+</script>
+</body>
+</html>
