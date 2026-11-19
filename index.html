@@ -21,7 +21,7 @@ input,textarea{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;b
 .btn{background:#0f172a;color:#fff;border:0;padding:13px;border-radius:10px;width:100%;font-weight:800;cursor:pointer;margin-top:10px}
 img.t{width:70px;height:70px;object-fit:cover;border-radius:8px;margin-top:5px}
 </style></head><body>
-<header><h1>QA AUDIT TOOL - RM to FG</h1><div style="font-size:12px;opacity:.8">LAB - RM - Cutting - Bonding/Heat Seal - Production - IE - Machine Maintanance - Safety - Mold - Management - QM</div></header>
+<header><h1>QA AUDIT TOOL - RM to FG</h1><div style="font-size:12px;opacity:.8">LAB - RM - Cutting - Bonding/Heat Seal - Production - IE - Machine - Safety - Mold - Management - QM</div></header>
 <nav id="nav"></nav><div class="wrap" id="app"></div>
 <script>
 var CFG={};
@@ -31,12 +31,12 @@ CFG["Cutting"]=["Plotter calibration","Spreading check report","Cutting In line 
 CFG["Bonding/Heat Seal"]=["Machine calibration reports available","2 hour condition report available","In line audit reports available","Supplier condition reports available","Certified operators only working","Mockup available","Good work place arrangement","Peel bond test reports available","Wash reports available"];
 CFG["Production"]=["3/0 in-line process reports available","Critical operation check report","Mid line 100% check report","End line 100% check report","AQL Reports","CAPA for findings (In-line, Endline, AQL)","Complete Style file available","Line Sample / Color Sample / Packing approval available","All operation mockup available","Critical operation identification","All operation SPI mockup available","Certified checker / packer in module","Sewing machine condition","Standard guages functioning","Production WIP in agreed amount","Glouce use for light / white colors","Traffic light system functioning","Defect tag system functioning","SOP Available for all process","Label file functioning","Reconsilation functioning","Production monitoring system","SPC Report"];
 CFG["IE"]=["Machine layouts","Machine wise RPM","Work place arrangement","5s"];
-CFG["Machine Maintanance"]=["Machine service record available","Oil control process","Threading way","Shuttle take-up spring, Tension post","Daily pressing machine check list"];
+CFG["Machine"]=["Machine service record available","Oil control process","Threading way","Shuttle take-up spring, Tension post","Daily pressing machine check list"];
 CFG["Safety"]=["Sharp tool log","Metal detector calibration record","2 Hourly 9 point MD Machine calibration","Hourly MD input report","Price ticket issue log","Needle procedure know by operator","Needle count match with system vs actual"];
 CFG["Mold"]=["Form 25","Humidity check report","Moisture level check by Aqua boy","Fabric in process mold check report"];
 CFG["Management"]=["KPI monitoring mechanism","Problem solving for deviation"];
 CFG["QM"]=["Pre-final report available","Final report available","Measurement report available"];
-var STAGES=["Dashboard","LAB","RM","Cutting","Bonding/Heat Seal","Production","IE","Machine Maintenance","Safety","Mold","Management","QM"];
+var STAGES=["Dashboard","LAB","RM","Cutting","Bonding/Heat Seal","Production","IE","Machine","Safety","Mold","Management","QM"];
 var cur="Dashboard";var st={};var ph={};
 var audits=[];try{audits=JSON.parse(localStorage.getItem("qa_audits")||"[]")}catch(e){audits=[]}
 function save(){localStorage.setItem("qa_audits",JSON.stringify(audits))}
